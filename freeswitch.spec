@@ -1279,21 +1279,21 @@ Provides XML-RPC interface for the FreeSWITCH Open Source telephone platform.
 #			FreeSWITCH ESL language modules
 ######################################################################################################################
 
-%package	-n perl-ESL
-Summary:	The Perl ESL module allows for native interaction with FreeSWITCH over the event socket interface.
-Group:		System Environment/Libraries
+#%package	-n perl-ESL
+#Summary:	The Perl ESL module allows for native interaction with FreeSWITCH over the event socket interface.
+#Group:		System Environment/Libraries
 
-%description	-n perl-ESL
-The Perl ESL module allows for native interaction with FreeSWITCH over the event socket interface.
+#%description	-n perl-ESL
+#The Perl ESL module allows for native interaction with FreeSWITCH over the event socket interface.
 
-%package	-n python-ESL
-Summary:	The Python ESL module allows for native interaction with FreeSWITCH over the event socket interface.
-Group:		System Environment/Libraries
-Requires:	python
-BuildRequires:	python-devel
-
-%description	-n python-ESL
-The Python ESL module allows for native interaction with FreeSWITCH over the event socket interface.
+#%package	-n python-ESL
+#Summary:	The Python ESL module allows for native interaction with FreeSWITCH over the event socket interface.
+#Group:		System Environment/Libraries
+#Requires:	python
+#BuildRequires:	python-devel
+#
+#%description	-n python-ESL
+#The Python ESL module allows for native interaction with FreeSWITCH over the event socket interface.
 
 ######################################################################################################################
 #				FreeSWITCH basic config module
@@ -2487,19 +2487,19 @@ fi
 #			FreeSWITCH ESL language modules
 ######################################################################################################################
 
-%files	-n perl-ESL
-%defattr(644,root,root,755)
-%{perl_archlib}/ESL.pm
-%{perl_archlib}/ESL.so
-%{perl_archlib}/ESL.la
-%dir %{perl_archlib}/ESL
-%{perl_archlib}/ESL/Dispatch.pm
-%{perl_archlib}/ESL/IVR.pm
+#%files	-n perl-ESL
+#%defattr(644,root,root,755)
+#%{perl_archlib}/ESL.pm
+#%{perl_archlib}/ESL.so
+#%{perl_archlib}/ESL.la
+#%dir %{perl_archlib}/ESL
+#%{perl_archlib}/ESL/Dispatch.pm
+#%{perl_archlib}/ESL/IVR.pm
 
-%files	-n python-ESL
-%attr(0644, root, bin) /usr/lib*/python*/site-packages/freeswitch.py*
-%attr(0755, root, bin) /usr/lib*/python*/site-packages/_ESL.so*
-%attr(0755, root, bin) /usr/lib*/python*/site-packages/ESL.py*
+#%files	-n python-ESL
+#%attr(0644, root, bin) /usr/lib*/python*/site-packages/freeswitch.py*
+#%attr(0755, root, bin) /usr/lib*/python*/site-packages/_ESL.so*
+#%attr(0755, root, bin) /usr/lib*/python*/site-packages/ESL.py*
 
 ######################################################################################################################
 #

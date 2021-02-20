@@ -11,16 +11,15 @@ After=network.target network-online.target local-fs.target
 Type=forking
 PIDFile=/run/freeswitch/freeswitch.pid
 Environment="DAEMON_OPTS=-nonat"
-Environment="USER=freeswitch"
-Environment="GROUP=freeswitch"
 EnvironmentFile=-/etc/default/freeswitch
-ExecStartPre=/bin/chown -R ${USER}:${GROUP} /var/lib/freeswitch /var/log/freeswitch /etc/freeswitch /usr/share/freeswitch /var/run/freeswitch
-ExecStart=/usr/bin/freeswitch -u ${USER} -g ${GROUP} -ncwait ${DAEMON_OPTS}
-TimeoutSec=45s
+ExecStartPre=/bin/mkdir -p /var/lib/freeswitch /var/lib/freeswitch/db /var/lib/freeswitch/recordings /var/lib/freeswitch/storage /var/log/freeswitch /var/run/freeswitch
+ExecStartPre=/bin/chown -R freeswitch:freeswitch /var/lib/freeswitch /var/log/freeswitch /etc/freeswitch /usr/share/freeswitch /var/run/freeswitch
+ExecStart=/usr/bin/freeswitch -u freeswitch -g freeswitch -ncwait $DAEMON_OPTS
+;TimeoutSec=45s
 Restart=always
 ; exec
-;User=${USER}
-;Group=${GROUP}
+User=root
+Group=daemon
 LimitCORE=infinity
 LimitNOFILE=100000
 LimitNPROC=60000
@@ -29,8 +28,8 @@ LimitRTPRIO=infinity
 LimitRTTIME=infinity
 IOSchedulingClass=realtime
 IOSchedulingPriority=2
-CPUSchedulingPolicy=rr
-CPUSchedulingPriority=89
+;CPUSchedulingPolicy=rr
+;CPUSchedulingPriority=89
 UMask=0007
 NoNewPrivileges=false
 
