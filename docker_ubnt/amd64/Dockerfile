@@ -17,7 +17,6 @@ RUN \
 
 RUN \
     mkdir /home/ubnt/.ssh && \
-    echo "nameserver 10.28.42.11" > /etc/resolv.conf && \
     ssh-keyscan -H github.com >> /home/ubnt/.ssh/known_hosts && \
     ssh-keyscan -H -p 2022 slc-unifi-scm.rad.ubnt.com >> /home/ubnt/.ssh/known_hosts
 
