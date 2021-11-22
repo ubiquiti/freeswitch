@@ -314,6 +314,47 @@ echo "<-# hook"
 EOF
 }
 
+libks_install_hook () {
+    cat <<'EOF'
+#!/bin/sh
+echo "#-> libks hook"
+
+echo "1) apt-get install -y ca-certificates wget uuid-dev git ssh-client"
+apt-get install -y ca-certificates wget uuid-dev git ssh-client
+
+echo "installing cmake"
+echo "2) wget https://cmake.org/files/v3.7/cmake-3.7.2.tar.gz"
+wget https://cmake.org/files/v3.7/cmake-3.7.2.tar.gz
+echo "3) tar -zxf cmake-3.7.2.tar.gz"
+tar -zxf cmake-3.7.2.tar.gz
+echo "4) cd cmake-3.7.2"
+cd cmake-3.7.2
+echo "5) ./bootstrap --prefix=/usr/local"
+./bootstrap --prefix=/usr/local
+echo "6) make"
+make
+echo "7) make install"
+make install
+echo "cmake version:"
+/usr/local/bin/cmake --version
+
+echo "installing libks 1.7.0"
+echo "apt-get install -y pkg-config cmake-data libssl-dev"
+echo "8) cd .. && git clone https://github.com/signalwire/libks.git"
+cd .. && git clone https://github.com/signalwire/libks.git
+echo "9) cd libks"
+cd libks
+echo "10) /usr/local/bin/cmake ."
+/usr/local/bin/cmake .
+echo "11) make"
+make 
+echo "12) make install"
+make install
+
+echo "<-# libks hook"
+EOF
+}
+
 get_sources () {
   local tgt_distro="$1"
   while read type args path distro components; do
@@ -536,6 +577,10 @@ EOF
     chmod +x .hooks/D70results
     fmt_apt_update_hook > .hooks/H70results
     chmod +x .hooks/H70results
+
+    # libks install hook
+    libks_install_hook > .hooks/A10libks
+    chmod +x .hooks/A10libks
     
     log "##################### COW BUILD #######################"
     
