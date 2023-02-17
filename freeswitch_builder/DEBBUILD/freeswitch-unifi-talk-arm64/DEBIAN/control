@@ -1,6 +1,0 @@
-Package: freeswitch-unifi-talk-arm64
-Version: 1.0
-Architecture: arm64
-Maintainer: Piotr Gregor <piotr.gregor@ui.com>
-Description: FreeSWITCH
- FreeSWITCH binaries (core and modules) for Ubiquiti Unifi Talk running on arm64
