@@ -37,6 +37,7 @@ freeswitch-debian-deps:
 	apt install -y libavformat-dev libswscale-dev libopus-dev libpq-dev libsndfile-dev
 
 freeswitch-conf:
+	mv freeswitch/modules_ubnt.conf freeswitch/modules.conf
 	sed -i '/mod_verto/d' freeswitch/modules.conf
 	sed -i '/mod_signalwire/d' freeswitch/modules.conf
 	sed -i '/mod_rtc/d' freeswitch/modules.conf
