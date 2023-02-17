@@ -34,10 +34,10 @@ spandsp: spandsp-src
 	cd spandsp && ./bootstrap.sh && ./configure CFLAGS="-ggdb -O0 -rdynamic" && make clean && make && make install
 
 freeswitch-debian-deps:
-	apt install -y libavformat-dev libswscale-dev libopus-dev libpq-dev libsndfile-dev
+	apt install -y libavformat-dev libswscale-dev libopus-dev libpq-dev libsndfile-dev flite1-dev libshout3-dev libmpg123-dev
 
 freeswitch-conf:
-	mv freeswitch/modules_ubnt.conf freeswitch/modules.conf
+	bash -c "[[ ! -e freeswitch/modules_ubnt.conf ]] || mv freeswitch/modules_ubnt.conf freeswitch/modules.conf"
 	sed -i '/mod_verto/d' freeswitch/modules.conf
 	sed -i '/mod_signalwire/d' freeswitch/modules.conf
 	sed -i '/mod_rtc/d' freeswitch/modules.conf
