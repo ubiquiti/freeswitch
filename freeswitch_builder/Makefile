@@ -102,3 +102,23 @@ console-freeswitch-amd64-debian: docker-image-amd64-debian sources
 		--rm \
 		fs_amd64_debian \
 		/bin/bash
+
+make-deb-arm64:
+	rm -rf DEBBUILD
+	mkdir -p DEBBUILD/freeswitch-unifi-talk-arm64/DEBIAN
+	### cd freeswitch && DESTDIR=`pwd`/DEBBUILD/freeswitch-unifi-talk-arm64 make install
+	mkdir -p `pwd`/DEBBUILD/freeswitch-unifi-talk-arm64/usr/local/test
+	cp platform/arm64_debian/DEBIAN/debian.control DEBBUILD/freeswitch-unifi-talk-arm64/DEBIAN/control
+	chmod -R g-s DEBBUILD
+	cd DEBBUILD && dpkg-deb --build --root-owner-group freeswitch-unifi-talk-arm64
+
+deb-arm64:
+	docker run -it \
+		-e USER=$(USER) \
+		-e GROUP=$(USER) \
+		-v $(PWD):/SRC \
+		--platform linux/arm64 \
+		--network=host \
+		--rm \
+		fs_arm64_debian \
+		/bin/bash -c "cd /SRC && make make-deb-arm64"

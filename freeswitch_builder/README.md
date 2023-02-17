@@ -4,16 +4,16 @@
 # Overview
 
 This is a tool for building FreeSWITCH on various combinations of CPU architectures and OS-es.
-It builds a FreeSWITCH from sources.
+It builds a FreeSWITCH from sources and packages outputs in debian package so it can be installed with `dpkg -i`.
 
 
 ## Folder structure
 
 - Makefile - make script, encapsulates all target recipes
 - README - this file, manual/description
-- platform - contains platform definitions for docker images
+- platform - contains platform definitions (for docker images) and deb control files
 
-Once you start building expect 3 more folders, containing sources:
+When building executables - expect 3 more folders to be created, they contain sources:
 
 - freeswitch
 - sofia-sip
@@ -21,15 +21,17 @@ Once you start building expect 3 more folders, containing sources:
 
 These source folders get mounted into docker containers when buidling FreeSWITCH.
 
+When building deb package - DEBBUILD folder is created and package is output in there (*.deb file).
 
-## Building procedure
 
-To build for arm64:deb11:
+## Building procedure to build FreeSWITCH
+
+for arm64:deb11:
 ```
 make freeswitch-arm64-debian
 ```
 
-To build for amd64:deb11:
+for amd64:deb11:
 ```
 make freeswitch-amd64-debian
 ```
@@ -40,6 +42,19 @@ edit platform/$arch/Dockerfile and change OS version, e.g. to compile for Debian
 FROM arm64v8/debian:9
 ```
 
+## Building procedure to build FreeSWITCH and get it packaged in deb package
+
+for arm64:deb11:
+```
+make freeswitch-arm64-debian
+make deb-arm64
+```
+
+for amd64:deb11:
+```
+make freeswitch-amd64-debian
+make deb-amd64
+```
 
 ## To open a console on docker image for building
 
