@@ -56,6 +56,8 @@ make freeswitch-amd64-debian
 make deb-amd64
 ```
 
+Debian package is created in DEBBUILD folder, e.g.: `DEBBUILD/freeswitch-unifi-talk-$(arch).deb`
+
 ## To open a console on docker image for building
 
 ```
