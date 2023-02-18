@@ -36,7 +36,7 @@ spandsp: spandsp-src
 freeswitch-debian-deps:
 	apt install -y libavformat-dev libswscale-dev libopus-dev libpq-dev libsndfile-dev flite1-dev libshout3-dev libmpg123-dev libmp3lame-dev
 
-freeswitch-conf:
+freeswitch-conf: freeswitch-src
 	bash -c "[[ ! -e freeswitch/modules_ubnt.conf ]] || mv freeswitch/modules_ubnt.conf freeswitch/modules.conf"
 	sed -i '/mod_verto/d' freeswitch/modules.conf
 	sed -i '/mod_signalwire/d' freeswitch/modules.conf
@@ -44,22 +44,19 @@ freeswitch-conf:
 	sed -i '/mod_skinny/d' freeswitch/modules.conf
 	sed -i '/mod_lua/d' freeswitch/modules.conf
 
-freeswitch-debian: sofia spandsp freeswitch-debian-deps freeswitch-conf
+freeswitch-debian: sofia spandsp freeswitch-src freeswitch-debian-deps freeswitch-conf
 	cd freeswitch && ./bootstrap.sh && ./configure CFLAGS="-ggdb -O0 -rdynamic" --prefix=$(FREESWITCH_PREFIX) && make && make install && cd -
 
 freeswitch-arm64-debian: docker-image-arm64-debian sources
 	docker run -it \
 		-e USER=$(USER) \
 		-e GROUP=$(USER) \
-		-v $(PWD)/Makefile:/build/Makefile \
-		-v $(PWD)/sofia-sip:/build/sofia-sip \
-		-v $(PWD)/spandsp:/build/spandsp \
-		-v $(PWD)/freeswitch:/build/freeswitch \
+		-v $(PWD):/SRC \
 		--platform linux/arm64 \
 		--network=host \
 		--rm \
 		fs_arm64_debian \
-		/bin/bash -c "make freeswitch-debian"
+		/bin/bash -c "cd /SRC && make freeswitch-debian"
 
 freeswitch-amd64-debian: docker-image-amd64-debian sources
 	docker run -it \
@@ -103,16 +100,16 @@ console-freeswitch-amd64-debian: docker-image-amd64-debian sources
 		fs_amd64_debian \
 		/bin/bash
 
-make-deb-arm64:
+make-deb-arm64: freeswitch-debian
 	rm -rf DEBBUILD
 	mkdir -p DEBBUILD/freeswitch-unifi-talk-arm64/DEBIAN
-	### cd freeswitch && DESTDIR=`pwd`/DEBBUILD/freeswitch-unifi-talk-arm64 make install
-	mkdir -p `pwd`/DEBBUILD/freeswitch-unifi-talk-arm64/usr/local/test
+	cd freeswitch && DESTDIR=`pwd`/DEBBUILD/freeswitch-unifi-talk-arm64 make install
+	### mkdir -p `pwd`/DEBBUILD/freeswitch-unifi-talk-arm64/usr/local/test
 	cp platform/arm64_debian/DEBIAN/debian.control DEBBUILD/freeswitch-unifi-talk-arm64/DEBIAN/control
 	chmod -R g-s DEBBUILD
 	cd DEBBUILD && dpkg-deb --build --root-owner-group freeswitch-unifi-talk-arm64
 
-deb-arm64:
+deb-arm64: docker-image-arm64-debian
 	docker run -it \
 		-e USER=$(USER) \
 		-e GROUP=$(USER) \
@@ -121,4 +118,4 @@ deb-arm64:
 		--network=host \
 		--rm \
 		fs_arm64_debian \
-		/bin/bash -c "cd /SRC && make make-deb-arm64"
+		/bin/bash -c "cd /SRC && make make-deb-arm64 && tail -f /dev/null"
