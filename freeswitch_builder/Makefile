@@ -27,11 +27,11 @@ spandsp-src:
 
 sources: sofia-src spandsp-src freeswitch-src
 
-sofia: sofia-src
-	cd sofia-sip && ./bootstrap.sh && ./configure CFLAGS="-ggdb -O0 -rdynamic" && make clean && make && make install
+_sofia: sofia-src
+	cd sofia-sip && ./bootstrap.sh && ./configure CFLAGS="-ggdb -O0 -rdynamic" && make && make install && cd - && touch _sofia
 
-spandsp: spandsp-src
-	cd spandsp && ./bootstrap.sh && ./configure CFLAGS="-ggdb -O0 -rdynamic" && make clean && make && make install
+_spandsp: spandsp-src
+	cd spandsp && ./bootstrap.sh && ./configure CFLAGS="-ggdb -O0 -rdynamic" && make && make install && cd - && touch _spandsp
 
 freeswitch-debian-deps:
 	apt install -y libavformat-dev libswscale-dev libopus-dev libpq-dev libsndfile-dev flite1-dev libshout3-dev libmpg123-dev libmp3lame-dev
@@ -44,8 +44,14 @@ freeswitch-conf: freeswitch-src
 	sed -i '/mod_skinny/d' freeswitch/modules.conf
 	sed -i '/mod_lua/d' freeswitch/modules.conf
 
-freeswitch-debian: sofia spandsp freeswitch-src freeswitch-debian-deps freeswitch-conf
-	cd freeswitch && ./bootstrap.sh && ./configure CFLAGS="-ggdb -O0 -rdynamic" --prefix=$(FREESWITCH_PREFIX) && make && make install && cd -
+_freeswitch-debian: _sofia _spandsp freeswitch-src freeswitch-debian-deps freeswitch-conf
+	cd freeswitch \
+	&& ./bootstrap.sh \
+	&& ./configure CFLAGS="-ggdb -O0 -rdynamic" --prefix=$(FREESWITCH_PREFIX) \
+	&& make \
+	&& make install \
+	&& cd - \
+	&& touch _freeswitch-debian
 
 freeswitch-arm64-debian: docker-image-arm64-debian sources
 	docker run -it \
@@ -56,7 +62,7 @@ freeswitch-arm64-debian: docker-image-arm64-debian sources
 		--network=host \
 		--rm \
 		fs_arm64_debian \
-		/bin/bash -c "cd /SRC && make freeswitch-debian"
+		/bin/bash -c "cd /SRC && make _freeswitch-debian"
 
 freeswitch-amd64-debian: docker-image-amd64-debian sources
 	docker run -it \
@@ -70,7 +76,7 @@ freeswitch-amd64-debian: docker-image-amd64-debian sources
 		--network=host \
 		--rm \
 		fs_amd64_debian \
-		/bin/bash -c "make freeswitch-debian"
+		/bin/bash -c "make _freeswitch-debian"
 
 console-freeswitch-arm64-debian: docker-image-arm64-debian sources
 	docker run -it \
@@ -100,10 +106,10 @@ console-freeswitch-amd64-debian: docker-image-amd64-debian sources
 		fs_amd64_debian \
 		/bin/bash
 
-make-deb-arm64: freeswitch-debian
+make-deb-arm64:  _freeswitch-debian
 	rm -rf DEBBUILD
 	mkdir -p DEBBUILD/freeswitch-unifi-talk-arm64/DEBIAN
-	cd freeswitch && DESTDIR=`pwd`/DEBBUILD/freeswitch-unifi-talk-arm64 make install
+	cd freeswitch && DESTDIR=`pwd`/../DEBBUILD/freeswitch-unifi-talk-arm64 make install
 	### mkdir -p `pwd`/DEBBUILD/freeswitch-unifi-talk-arm64/usr/local/test
 	cp platform/arm64_debian/DEBIAN/debian.control DEBBUILD/freeswitch-unifi-talk-arm64/DEBIAN/control
 	chmod -R g-s DEBBUILD
@@ -118,4 +124,4 @@ deb-arm64: docker-image-arm64-debian
 		--network=host \
 		--rm \
 		fs_arm64_debian \
-		/bin/bash -c "cd /SRC && make make-deb-arm64 && tail -f /dev/null"
+		/bin/bash ### -c "cd /SRC && make make-deb-arm64 && tail -f /dev/null"
