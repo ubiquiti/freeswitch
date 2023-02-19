@@ -16,27 +16,33 @@ docker-image-amd64-debian:
                 --build-arg ARCH=amd64 \
                 -t fs_amd64_debian .
 
-freeswitch-src:
+freeswitch:
 	bash -c "[[ -d freeswitch ]] || git clone $(FREESWITCH_SRC)"
 
-sofia-src:
+sofia-sip:
 	bash -c "[[ -d sofia-sip ]] || git clone $(SOFIA_SRC)"
 
-spandsp-src:
+spandsp:
 	bash -c "[[ -d spandsp ]] || git clone $(SPANDSP_SRC)"
 
-sources: sofia-src spandsp-src freeswitch-src
+sources: sofia-sip spandsp freeswitch
 
-_sofia: sofia-src
+_sofia: sofia-sip
 	cd sofia-sip && ./bootstrap.sh && ./configure CFLAGS="-ggdb -O0 -rdynamic" && make && make install && cd - && touch _sofia
 
-_spandsp: spandsp-src
+sofia-install:
+	cd sofia-sip && make install
+
+_spandsp: spandsp
 	cd spandsp && ./bootstrap.sh && ./configure CFLAGS="-ggdb -O0 -rdynamic" && make && make install && cd - && touch _spandsp
+
+spandsp-install:
+	cd spandsp && make install
 
 freeswitch-debian-deps:
 	apt install -y libavformat-dev libswscale-dev libopus-dev libpq-dev libsndfile-dev flite1-dev libshout3-dev libmpg123-dev libmp3lame-dev
 
-freeswitch-conf: freeswitch-src
+freeswitch-conf: freeswitch
 	bash -c "[[ ! -e freeswitch/modules_ubnt.conf ]] || mv freeswitch/modules_ubnt.conf freeswitch/modules.conf"
 	sed -i '/mod_verto/d' freeswitch/modules.conf
 	sed -i '/mod_signalwire/d' freeswitch/modules.conf
@@ -44,7 +50,7 @@ freeswitch-conf: freeswitch-src
 	sed -i '/mod_skinny/d' freeswitch/modules.conf
 	sed -i '/mod_lua/d' freeswitch/modules.conf
 
-_freeswitch-debian: _sofia _spandsp freeswitch-src freeswitch-debian-deps freeswitch-conf
+_freeswitch-debian: _sofia sofia-install _spandsp spandsp-install freeswitch freeswitch-debian-deps freeswitch-conf
 	cd freeswitch \
 	&& ./bootstrap.sh \
 	&& ./configure CFLAGS="-ggdb -O0 -rdynamic" --prefix=$(FREESWITCH_PREFIX) \
@@ -68,10 +74,7 @@ freeswitch-amd64-debian: docker-image-amd64-debian sources
 	docker run -it \
 		-e USER=$(USER) \
 		-e GROUP=$(USER) \
-		-v $(PWD)/Makefile:/build/Makefile \
-		-v $(PWD)/sofia-sip:/build/sofia-sip \
-		-v $(PWD)/spandsp:/build/spandsp \
-		-v $(PWD)/freeswitch:/build/freeswitch \
+		-v $(PWD):/SRC \
 		--platform linux/arm64 \
 		--network=host \
 		--rm \
@@ -82,10 +85,7 @@ console-freeswitch-arm64-debian: docker-image-arm64-debian sources
 	docker run -it \
 		-e USER=$(USER) \
 		-e GROUP=$(USER) \
-		-v $(PWD)/Makefile:/build/Makefile \
-		-v $(PWD)/sofia-sip:/build/sofia-sip \
-		-v $(PWD)/spandsp:/build/spandsp \
-		-v $(PWD)/freeswitch:/build/freeswitch \
+		-v $(PWD):/SRC \
 		--platform linux/arm64 \
 		--network=host \
 		--rm \
@@ -96,10 +96,7 @@ console-freeswitch-amd64-debian: docker-image-amd64-debian sources
 	docker run -it \
 		-e USER=$(USER) \
 		-e GROUP=$(USER) \
-		-v $(PWD)/Makefile:/build/Makefile \
-		-v $(PWD)/sofia-sip:/build/sofia-sip \
-		-v $(PWD)/spandsp:/build/spandsp \
-		-v $(PWD)/freeswitch:/build/freeswitch \
+		-v $(PWD):/SRC \
 		--platform linux/amd64 \
 		--network=host \
 		--rm \
@@ -124,4 +121,4 @@ deb-arm64: docker-image-arm64-debian
 		--network=host \
 		--rm \
 		fs_arm64_debian \
-		/bin/bash ### -c "cd /SRC && make make-deb-arm64 && tail -f /dev/null"
+		/bin/bash -c "cd /SRC && make make-deb-arm64"
