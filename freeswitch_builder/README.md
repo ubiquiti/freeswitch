@@ -1,5 +1,12 @@
 # FreeSWITCH Builder
 
+# Quick start
+
+To create debian package for arm64:
+
+```
+make deb-arm64
+```
 
 # Overview
 
@@ -7,7 +14,7 @@ This is a tool for building FreeSWITCH on various combinations of CPU architectu
 It builds a FreeSWITCH from sources and packages outputs in debian package so it can be installed with `dpkg -i`.
 
 
-## Folder structure
+# Folder structure
 
 - Makefile - make script, encapsulates all target recipes
 - README - this file, manual/description
@@ -24,7 +31,7 @@ These source folders get mounted into docker containers when buidling FreeSWITCH
 When building deb package - DEBBUILD folder is created and package is output in there (*.deb file).
 
 
-## Building procedure to build FreeSWITCH
+# Building procedure to build FreeSWITCH
 
 for arm64:deb11:
 ```
@@ -42,29 +49,28 @@ edit platform/$arch/Dockerfile and change OS version, e.g. to compile for Debian
 FROM arm64v8/debian:9
 ```
 
-## Building procedure to build FreeSWITCH and get it packaged in deb package
+# Building procedure to build FreeSWITCH and get it packaged in deb package
 
 for arm64:deb11:
 ```
-make freeswitch-arm64-debian
 make deb-arm64
 ```
 
 for amd64:deb11:
 ```
-make freeswitch-amd64-debian
 make deb-amd64
 ```
 
 Debian package is created in DEBBUILD folder, e.g.: `DEBBUILD/freeswitch-unifi-talk-$(arch).deb`
 
-## To open a console on docker image for building
+# To open a console on docker image
 
+Execute this to get a console on docker, so you can build FreeSWITCH/packages and look around
 ```
 make console-freeswitch-arm64-debian
 ```
 
-## FreeSWITCH setup
+# FreeSWITCH setup
 
 This is the configuration FreeSWITCH is built with:
 

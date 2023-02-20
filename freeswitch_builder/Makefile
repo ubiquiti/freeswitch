@@ -39,6 +39,22 @@ _spandsp: spandsp
 spandsp-install:
 	cd spandsp && make install
 
+_freeswitch: freeswitch
+	make sofia-install \
+	&& make spandsp-install \
+	&& make freeswitch-debian-deps \
+	&& make freeswitch-conf \
+	&& cd freeswitch \
+	&& ./bootstrap.sh \
+	&& ./configure CFLAGS="-ggdb -O0 -rdynamic" --prefix=$(FREESWITCH_PREFIX) \
+	&& make \
+	&& make install \
+	&& cd - \
+	&& touch _freeswitch
+
+freeswitch-install:
+	cd freeswitch && make install
+
 freeswitch-debian-deps:
 	apt install -y libavformat-dev libswscale-dev libopus-dev libpq-dev libsndfile-dev flite1-dev libshout3-dev libmpg123-dev libmp3lame-dev
 
@@ -49,15 +65,10 @@ freeswitch-conf: freeswitch
 	sed -i '/mod_rtc/d' freeswitch/modules.conf
 	sed -i '/mod_skinny/d' freeswitch/modules.conf
 	sed -i '/mod_lua/d' freeswitch/modules.conf
+	### Testing only
+	### echo 'applications/mod_commands' > freeswitch/modules.conf
 
-_freeswitch-debian: _sofia sofia-install _spandsp spandsp-install freeswitch freeswitch-debian-deps freeswitch-conf
-	cd freeswitch \
-	&& ./bootstrap.sh \
-	&& ./configure CFLAGS="-ggdb -O0 -rdynamic" --prefix=$(FREESWITCH_PREFIX) \
-	&& make \
-	&& make install \
-	&& cd - \
-	&& touch _freeswitch-debian
+_freeswitch-debian: _sofia _spandsp _freeswitch sofia-install spandsp-install freeswitch-install
 
 freeswitch-arm64-debian: docker-image-arm64-debian sources
 	docker run -it \
