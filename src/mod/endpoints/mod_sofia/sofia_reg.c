@@ -899,6 +899,10 @@ void sofia_reg_check_ping_expire(sofia_profile_t *profile, time_t now, int inter
 	char buf[32] = "";
 	int count;
 
+    if (profile && !zstr(profile->name)) {
+        switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG3, "Check ping expires for profile %s\n", profile->name);
+    }
+
 	if (now) {
 		if (sofia_test_pflag(profile, PFLAG_ALL_REG_OPTIONS_PING)) {
 			sql = switch_mprintf("select call_id,sip_user,sip_host,contact,status,rpid,"
