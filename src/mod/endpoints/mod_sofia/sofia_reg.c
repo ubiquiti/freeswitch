@@ -363,13 +363,25 @@ void sofia_reg_check_gateway(sofia_profile_t *profile, time_t now)
 		reg_state_t ostate = gateway_ptr->state;
 		char *user_via = NULL;
 		char *register_host = NULL;
+		int force_send_first_ping = 0;
 
 		if (!now && ostate != REG_STATE_NOREG) {
 			gateway_ptr->state = ostate = REG_STATE_UNREGED;
 			gateway_ptr->expires_str = "0";
 		}
 
-		if (gateway_ptr->ping && !gateway_ptr->pinging && (now >= gateway_ptr->ping && (ostate == REG_STATE_NOREG || ostate == REG_STATE_REGED)) &&
+		if (gateway_ptr->ping_count_total == 0) {
+		    switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG1, "PING [profile=%s][gateway=%s][count=%zu] checking if should force to send first ping\n", profile->name, gateway_ptr->name, gateway_ptr->ping_count_total);
+		    if (gateway_ptr->first_ping) {
+		        switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG1, "PING [profile=%s][gateway=%s][count=%zu] first ping to send in %zu seconds\n", profile->name, gateway_ptr->name, gateway_ptr->ping_count_total, gateway_ptr->first_ping - now);
+		        if (now >= gateway_ptr->first_ping) {
+		            switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG1, "PING [profile=%s][gateway=%s][count=%zu] force\n", profile->name, gateway_ptr->name, gateway_ptr->ping_count_total);
+		            force_send_first_ping = 1;
+		        }
+		    }
+		}
+
+		if (gateway_ptr->ping && !gateway_ptr->pinging && ((now >= gateway_ptr->ping || force_send_first_ping) && (ostate == REG_STATE_NOREG || ostate == REG_STATE_REGED)) &&
 			!gateway_ptr->deleted) {
 			nua_handle_t *nh = nua_handle(profile->nua, NULL, NUTAG_URL(gateway_ptr->register_url), TAG_END());
 			sofia_private_t *pvt;
