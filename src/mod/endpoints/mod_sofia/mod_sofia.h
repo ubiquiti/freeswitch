@@ -550,6 +550,7 @@ struct sofia_gateway {
 	uint32_t contact_in_ping;
 	uint32_t ping_freq;
 	int ping_count;
+	size_t ping_count_total;
 	int ping_max;
 	int ping_min;
 	switch_time_t ping_sent;

@@ -3836,6 +3836,7 @@ static void parse_gateways(sofia_profile_t *profile, switch_xml_t gateways_tag, 
 			gateway->ping_sent = 0;
 			gateway->ping_time = 0;
 			gateway->ping_count = 0;
+			gateway->ping_count_total = 0;
 			gateway->ping_monitoring = SWITCH_FALSE;
 			gateway->ib_calls = 0;
 			gateway->ob_calls = 0;

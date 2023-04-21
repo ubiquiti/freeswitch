@@ -393,6 +393,8 @@ void sofia_reg_check_gateway(sofia_profile_t *profile, time_t now)
 
 			gateway_ptr->pinging = 1;
 			gateway_ptr->ping_sent = switch_time_now();
+			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG1, "PING [profile=%s][gateway=%s][count=%zu]\n", profile->name, gateway_ptr->name, gateway_ptr->ping_count_total);
+			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG1, "PING [profile=%s][gateway=%s][to=%s][from=%s]\n", profile->name, gateway_ptr->name, gateway_ptr->options_to_uri, gateway_ptr->options_from_uri);
 			nua_options(nh,
 						TAG_IF(gateway_ptr->register_sticky_proxy, NUTAG_PROXY(gateway_ptr->register_sticky_proxy)),
 						TAG_IF(user_via, SIPTAG_VIA_STR(user_via)),
@@ -400,7 +402,7 @@ void sofia_reg_check_gateway(sofia_profile_t *profile, time_t now)
 						TAG_IF(gateway_ptr->contact_in_ping, SIPTAG_CONTACT_STR(gateway_ptr->register_contact)),
 						TAG_IF(gateway_ptr->options_user_agent, SIPTAG_USER_AGENT_STR(gateway_ptr->options_user_agent)),
 						TAG_END());
-
+			gateway_ptr->ping_count_total = gateway_ptr->ping_count_total + 1;
 			switch_safe_free(user_via);
 			user_via = NULL;
 		}
@@ -637,6 +639,8 @@ int sofia_reg_nat_callback(void *pArg, int argc, char **argv, char **columnNames
 	pvt->destroy_me = 1;
 	pvt->ping_sent = switch_time_now();
 	nua_handle_bind(nh, pvt);
+
+    switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG3, "TX ping [profile][to][dst->route] [%s][%s][%s]\n", profile->name, to, dst->route);
 
 	nua_options(nh,
 				NTATAG_SIP_T2(5000),
