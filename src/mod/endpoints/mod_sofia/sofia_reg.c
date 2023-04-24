@@ -371,11 +371,11 @@ void sofia_reg_check_gateway(sofia_profile_t *profile, time_t now)
 		}
 
 		if (gateway_ptr->ping_count_total == 0) {
-		    switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG1, "PING [profile=%s][gateway=%s][count=%zu] checking if should force to send first ping\n", profile->name, gateway_ptr->name, gateway_ptr->ping_count_total);
+		    switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG3, "PING [profile=%s][gateway=%s][count=%zu] checking if should force to send first ping\n", profile->name, gateway_ptr->name, gateway_ptr->ping_count_total);
 		    if (gateway_ptr->first_ping) {
-		        switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG1, "PING [profile=%s][gateway=%s][count=%zu] first ping to send in %zu seconds\n", profile->name, gateway_ptr->name, gateway_ptr->ping_count_total, gateway_ptr->first_ping - now);
+		        switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG3, "PING [profile=%s][gateway=%s][count=%zu] first ping to send in %zu seconds\n", profile->name, gateway_ptr->name, gateway_ptr->ping_count_total, gateway_ptr->first_ping - now);
 		        if (now >= gateway_ptr->first_ping) {
-		            switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG1, "PING [profile=%s][gateway=%s][count=%zu] force\n", profile->name, gateway_ptr->name, gateway_ptr->ping_count_total);
+		            switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG3, "PING [profile=%s][gateway=%s][count=%zu] force\n", profile->name, gateway_ptr->name, gateway_ptr->ping_count_total);
 		            force_send_first_ping = 1;
 		        }
 		    }
@@ -405,8 +405,8 @@ void sofia_reg_check_gateway(sofia_profile_t *profile, time_t now)
 
 			gateway_ptr->pinging = 1;
 			gateway_ptr->ping_sent = switch_time_now();
-			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG1, "PING [profile=%s][gateway=%s][count=%zu]\n", profile->name, gateway_ptr->name, gateway_ptr->ping_count_total);
-			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG1, "PING [profile=%s][gateway=%s][to=%s][from=%s]\n", profile->name, gateway_ptr->name, gateway_ptr->options_to_uri, gateway_ptr->options_from_uri);
+			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG3, "PING [profile=%s][gateway=%s][count=%zu]\n", profile->name, gateway_ptr->name, gateway_ptr->ping_count_total);
+			switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG3, "TX PING [profile=%s][gateway=%s][to=%s][from=%s]\n", profile->name, gateway_ptr->name, gateway_ptr->options_to_uri, gateway_ptr->options_from_uri);
 			nua_options(nh,
 						TAG_IF(gateway_ptr->register_sticky_proxy, NUTAG_PROXY(gateway_ptr->register_sticky_proxy)),
 						TAG_IF(user_via, SIPTAG_VIA_STR(user_via)),
@@ -652,7 +652,7 @@ int sofia_reg_nat_callback(void *pArg, int argc, char **argv, char **columnNames
 	pvt->ping_sent = switch_time_now();
 	nua_handle_bind(nh, pvt);
 
-    switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG3, "TX ping [profile][to][dst->route] [%s][%s][%s]\n", profile->name, to, dst->route);
+    switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG3, "TX PING [profile][to][dst->route] [%s][%s][%s]\n", profile->name, to, dst->route);
 
 	nua_options(nh,
 				NTATAG_SIP_T2(5000),
@@ -916,7 +916,7 @@ void sofia_reg_check_ping_expire(sofia_profile_t *profile, time_t now, int inter
 	int count;
 
     if (profile && !zstr(profile->name)) {
-        switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG3, "Check ping expires for profile %s\n", profile->name);
+        switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_DEBUG3, "PING check ping expire for profile %s\n", profile->name);
     }
 
 	if (now) {

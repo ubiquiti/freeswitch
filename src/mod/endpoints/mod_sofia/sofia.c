@@ -4126,7 +4126,7 @@ static void parse_gateways(sofia_profile_t *profile, switch_xml_t gateways_tag, 
 						gateway->contact_in_ping = contact_in_ping;
 					}
 					gateway->first_ping = first_ping ? switch_epoch_time_now(NULL) + first_ping : 0;
-                    switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_NOTICE, "Gateway %s: first-ping=%u\n", gateway->name, gateway->first_ping);
+					switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_NOTICE, "Gateway %s: first-ping=%u\n", gateway->name, gateway->first_ping);
 				} else {
 					switch_log_printf(SWITCH_CHANNEL_LOG, SWITCH_LOG_ERROR, "ERROR: invalid ping!\n");
 				}
